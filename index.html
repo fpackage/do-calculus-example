@@ -1,0 +1,288 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Do-Calculus by Hand</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column like a worked problem set; main derivation in serif ink, refresher notes as tinted pencil annotations underneath each step */
+:root{
+  --paper:#fbfbf8; --ink:#1d2230; --muted:#5b6274; --rule:#d9dbe0;
+  --accent:#2f3f9e; --note-bg:#e9f3f1; --note-ink:#1f5a52; --note-label:#2c7a6f;
+  --cut:#b8462e; --tbl:#f1f2f5;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15171d; --ink:#e4e6ec; --muted:#a0a6b5; --rule:#2f333d;
+  --accent:#9aa8ff; --note-bg:#17282a; --note-ink:#a8dbd2; --note-label:#6cc7b8;
+  --cut:#f08a70; --tbl:#1d2027; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#15171d; --ink:#e4e6ec; --muted:#a0a6b5; --rule:#2f333d;
+  --accent:#9aa8ff; --note-bg:#17282a; --note-ink:#a8dbd2; --note-label:#6cc7b8;
+  --cut:#f08a70; --tbl:#1d2027; color-scheme:dark}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+main{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:2.3rem;line-height:1.15;margin:0;text-wrap:balance;font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.55rem;margin:34px 0 0;text-wrap:balance;padding-top:18px;border-top:1px solid var(--rule)}
+h3{font-size:1.15rem;margin:10px 0 0;color:var(--accent);font-weight:600}
+p{margin:0}
+.lede{color:var(--muted);font-size:1.05rem}
+.eyebrow{font-family:var(--sans);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.key{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-family:var(--sans);font-size:.85rem;color:var(--muted)}
+.key span.sw{display:inline-block;padding:2px 8px;background:var(--note-bg);color:var(--note-ink)}
+.step{display:flex;flex-direction:column;gap:10px}
+.note{font-family:var(--sans);font-size:.86rem;line-height:1.55;color:var(--note-ink);background:var(--note-bg);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.note::before{content:"In plain words";font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--note-label)}
+.note.sym::before{content:"Symbol refresher"}
+.note.why::before{content:"Why this rule makes sense"}
+.note.num::before{content:"The arithmetic"}
+.note b{font-weight:600}
+.eq{overflow-x:auto;overflow-y:hidden;max-width:100%}
+mjx-container[display="true"]{margin:.4em 0!important}
+.rule{border-left:2px solid var(--rule);padding-left:16px;display:flex;flex-direction:column;gap:8px}
+.rule .name{font-weight:600}
+.glossary{display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:8px 18px;font-family:var(--sans);font-size:.9rem;align-items:baseline}
+.glossary > div{min-width:0}
+.glossary .s{font-size:1rem}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums;min-width:460px;width:100%}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--rule)}
+th{background:var(--tbl);font-weight:600}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+figure{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0}
+figure svg{width:100%;height:auto;max-width:100%}
+figcaption{font-family:var(--sans);font-size:.7rem;color:var(--muted)}
+.dag .edge{stroke:var(--ink);stroke-width:1.6;fill:none}
+.dag .edge.cut{stroke:var(--cut);stroke-dasharray:4 4;opacity:.75}
+.dag .head{fill:var(--ink)} .dag .head.cut{fill:var(--cut);opacity:.75}
+.dag circle{fill:var(--paper);stroke:var(--ink);stroke-width:1.6}
+.dag circle.hidden{stroke-dasharray:3 3;stroke:var(--muted)}
+.dag text{fill:var(--ink);font-family:var(--serif);font-style:italic;font-size:17px;text-anchor:middle;dominant-baseline:central}
+.dag text.lab{font-family:var(--sans);font-style:normal;font-size:10px;fill:var(--muted)}
+.result{padding:6px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+@media (max-width:480px){body{font-size:17px}h1{font-size:1.85rem}.glossary{grid-template-columns:1fr;gap:2px}.glossary .s{margin-top:8px}}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<main>
+<header class="step">
+  <div class="eyebrow">Pearl's do-calculus, worked by hand</div>
+  <h1>Do-Calculus by Hand</h1>
+  <p class="lede">Two worked derivations: a confounded treatment with real numbers, and the front-door case where the confounder is never observed. Every step is followed by a refresher for readers who did math at university but no longer have the notation at their fingertips.</p>
+  <div class="key"><span>Serif text: the derivation as a math student would read it.</span><span class="sw">Teal boxes: the refresher.</span></div>
+</header>
+
+<h2>Notation you will need</h2>
+<div class="glossary note sym">
+  <div class="s">\(P(y)\)</div><div>Probability that variable \(Y\) takes the value \(y\). Capital letter is the variable, lowercase is a concrete value.</div>
+  <div class="s">\(P(y \mid x)\)</div><div>Conditional probability, read "probability of \(y\) given \(x\)". Look only at the cases where \(X=x\) happened, then ask how often \(Y=y\). This is <b>seeing</b>.</div>
+  <div class="s">\(P(y \mid do(x))\)</div><div>Probability of \(y\) if we <b>force</b> \(X\) to be \(x\) for everyone, regardless of what would normally cause \(X\). This is <b>doing</b>. It describes a hypothetical experiment.</div>
+  <div class="s">\(\sum_z\)</div><div>Sum over every possible value of \(Z\). With \(Z\in\{\text{young},\text{old}\}\) it means: compute the expression once for young, once for old, add the two.</div>
+  <div class="s">\(A \perp B\)</div><div>\(A\) and \(B\) are independent: knowing one tells you nothing about the other.</div>
+  <div class="s">\((A \perp B \mid C)\)</div><div>Independent <b>once you know</b> \(C\). They may look related overall, but inside each group of equal \(C\) the relationship disappears.</div>
+  <div class="s">\(G_{\overline{X}}\)</div><div>The causal graph with every arrow pointing <b>into</b> \(X\) deleted. Mnemonic: the bar sits on top, like cutting the wires coming down into \(X\). This is what an intervention does: \(X\) no longer listens to its usual causes.</div>
+  <div class="s">\(G_{\underline{X}}\)</div><div>The graph with every arrow going <b>out of</b> \(X\) deleted. Bar on the bottom, wires leaving \(X\) cut. Used to ask: is there any connection between \(X\) and \(Y\) <i>other than</i> the causal effect of \(X\)?</div>
+</div>
+
+<div class="step">
+  <h3>Reading independence off a graph (d-separation)</h3>
+  <p>Every independence check below is done by looking at paths in a graph. A path is any route between two nodes following edges, ignoring arrow direction. Two variables are independent if every path between them is <i>blocked</i>.</p>
+  <div class="note">
+    <div>There are only three kinds of junction a path can pass through at a middle node \(B\):</div>
+    <div><b>Chain</b> \(A \to B \to C\): information flows through \(B\). Blocked if you condition on \(B\). (Rain makes the road wet, wet road causes accidents. Once you know the road is wet, rain tells you nothing more about accidents.)</div>
+    <div><b>Fork</b> \(A \leftarrow B \to C\): \(B\) is a common cause. Also blocked if you condition on \(B\). (Age causes both treatment and recovery. Within one age group, the shared cause no longer links them.)</div>
+    <div><b>Collider</b> \(A \to B \leftarrow C\): two arrows crash into \(B\). This is the opposite case: the path is blocked <b>by default</b> and only opens if you condition on \(B\). (Talent and luck both cause fame. Among the general population they are unrelated.)</div>
+    <div>So the checks below always reduce to: list the paths, look at each middle node, decide blocked or open.</div>
+  </div>
+</div>
+
+<h2>The three rules</h2>
+<p>The goal is always the same: rewrite an expression that contains \(do(\cdot)\) until no \(do\) remains. Then it can be computed from ordinary observational data.</p>
+<div class="note"><div>Each rule says: you may change the formula in a specific way, <b>provided</b> a certain independence holds in a certain modified graph. The rules are the permission slips; the graph checks are how you earn them.</div></div>
+
+<div class="rule">
+  <div class="name">Rule 1: insert or delete an observation</div>
+  <div class="eq">\[P(y \mid do(x), z, w) = P(y \mid do(x), w) \quad\text{if}\quad (Y \perp Z \mid X, W) \text{ in } G_{\overline{X}}\]</div>
+  <div class="note why"><div>After the intervention on \(X\), if \(Z\) carries no information about \(Y\) (given what else you know, \(W\)), you can simply drop \(Z\) from the condition. This is ordinary conditional independence, just checked in the graph of the intervened world. Neither example below needs it, but it is part of the set.</div></div>
+</div>
+<div class="rule">
+  <div class="name">Rule 2: swap action and observation</div>
+  <div class="eq">\[P(y \mid do(x), do(z), w) = P(y \mid do(x), z, w) \quad\text{if}\quad (Y \perp Z \mid X, W) \text{ in } G_{\overline{X}\underline{Z}}\]</div>
+  <div class="note why"><div>When is <b>forcing</b> \(Z\) the same as merely <b>seeing</b> \(Z\)? When the only way \(Z\) and \(Y\) are connected is through \(Z\)'s own causal effect. To test that, cut the arrows leaving \(Z\) (that removes its causal effect) and check whether anything still connects \(Z\) to \(Y\). If nothing does, there is no "back door" path producing spurious correlation, and seeing equals doing.</div></div>
+</div>
+<div class="rule">
+  <div class="name">Rule 3: insert or delete an action</div>
+  <div class="eq">\[P(y \mid do(x), do(z), w) = P(y \mid do(x), w) \quad\text{if}\quad (Y \perp Z \mid X, W) \text{ in } G_{\overline{X}\,\overline{Z(W)}}\]</div>
+  <div class="note why"><div>If forcing \(Z\) cannot change \(Y\) at all, you can delete \(do(z)\) entirely. The test: cut the arrows into \(Z\) (as the intervention would) and check that \(Z\) and \(Y\) are disconnected.</div><div>The \(Z(W)\) detail: if some node in \(W\) is a descendant of \(Z\), you only cut arrows into those parts of \(Z\) that are <i>not</i> ancestors of \(W\). In both examples below \(W\) is empty, so you can read it as plain \(G_{\overline{X}\overline{Z}}\).</div></div>
+</div>
+
+<h2>Example 1: a confounded treatment</h2>
+<div class="step">
+  <p>\(Z\) is age (young or old), \(X\) is treatment (0 or 1), \(Y\) is recovery (0 or 1). Age influences both who gets treated and who recovers.</p>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex1"></div><figcaption>\(G\): the causal graph</figcaption></figure>
+  </div>
+  <div class="note"><div>An arrow means "directly causes". \(Z \to X\): older people are more often treated. \(Z \to Y\): older people recover less. \(X \to Y\): the treatment's actual effect, which is what we want to measure. The trouble is that age creates a correlation between \(X\) and \(Y\) that has nothing to do with the treatment.</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 1: split by age</h3>
+  <div class="eq">\[P(y \mid do(x)) = \sum_z P(y \mid do(x), z)\; P(z \mid do(x))\]</div>
+  <div class="note"><div>This is just the <b>law of total probability</b>, \(P(y) = \sum_z P(y \mid z)\,P(z)\), applied inside the intervened world. In words: the overall recovery rate equals the recovery rate among young times the share of young, plus the same for old. Nothing causal has happened yet; we only broke the problem into two pieces, each still containing a \(do\).</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 2: remove the action from the age distribution</h3>
+  <div class="eq">\[P(z \mid do(x)) = P(z) \qquad\text{by Rule 3}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex1" data-cut="Z>X"></div><figcaption>\(G_{\overline{X}}\): arrow into \(X\) cut</figcaption></figure>
+  </div>
+  <p>Check \((Z \perp X)\) in \(G_{\overline{X}}\): the only path is \(X \to Y \leftarrow Z\), a collider at \(Y\), hence blocked.</p>
+  <div class="note"><div>The question is: does forcing a treatment change how old people are? Obviously not, and the graph confirms it. After cutting \(Z \to X\), the only route between \(X\) and \(Z\) goes through \(Y\), where both arrows point into \(Y\). That is a collider, blocked by default, and we are not conditioning on \(Y\). So \(X\) and \(Z\) are disconnected, and the \(do(x)\) can be deleted.</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 3: turn doing into seeing within each age group</h3>
+  <div class="eq">\[P(y \mid do(x), z) = P(y \mid x, z) \qquad\text{by Rule 2}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex1" data-cut="X>Y"></div><figcaption>\(G_{\underline{X}}\): arrow out of \(X\) cut</figcaption></figure>
+  </div>
+  <p>Check \((Y \perp X \mid Z)\) in \(G_{\underline{X}}\): the remaining path \(X \leftarrow Z \to Y\) is a fork at \(Z\), blocked because we condition on \(Z\).</p>
+  <div class="note"><div>Cutting \(X \to Y\) removes the real treatment effect. If \(X\) and \(Y\) are <i>still</i> connected after that, the connection is spurious. Here the only leftover path runs through age, a fork. Since we are already looking within a single age group (\(z\) is in the condition), that path is blocked. Conclusion: inside one age group, treated and untreated people are comparable, so the observed recovery rate among the treated equals what forcing the treatment would give.</div></div>
+</div>
+
+<div class="step">
+  <h3>Result: the backdoor adjustment formula</h3>
+  <div class="eq result">\[P(y \mid do(x)) = \sum_z P(y \mid x, z)\; P(z)\]</div>
+  <div class="note"><div>Every term is now observable. Read it as a recipe: compute the recovery rate of the treated in each age group, then average those rates using the <b>population's</b> age mix \(P(z)\), not the age mix of the people who happened to get treated.</div></div>
+</div>
+
+<div class="step">
+  <h3>With numbers</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Age \(z\)</th><th>\(P(z)\)</th><th>\(P(X{=}1 \mid z)\)</th><th>\(P(Y{=}1 \mid X{=}0, z)\)</th><th>\(P(Y{=}1 \mid X{=}1, z)\)</th></tr></thead>
+    <tbody>
+      <tr><td>young</td><td>0.5</td><td>0.2</td><td>0.8</td><td>0.9</td></tr>
+      <tr><td>old</td><td>0.5</td><td>0.8</td><td>0.3</td><td>0.4</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><div>Columns, left to right: half the population is old. 20% of young and 80% of old get treated. Recovery rates without and with treatment per age group. In each group, treatment adds exactly 10 percentage points. So we know the true answer should be +0.10.</div></div>
+
+  <p><b>Causal answer</b>, using the formula:</p>
+  <div class="eq">\[P(Y{=}1 \mid do(X{=}1)) = 0.5 \cdot 0.9 + 0.5 \cdot 0.4 = 0.65\]</div>
+  <div class="eq">\[P(Y{=}1 \mid do(X{=}0)) = 0.5 \cdot 0.8 + 0.5 \cdot 0.3 = 0.55\]</div>
+  <div class="note num"><div>First line: imagine treating everyone. Young people (half of all) would recover at 0.9, old people (other half) at 0.4. Weighted average 0.65. Second line: treat nobody, average of 0.8 and 0.3 gives 0.55. The difference 0.65 minus 0.55 is the <b>average causal effect</b>: +0.10. Correct.</div></div>
+
+  <p><b>Naive answer</b>, comparing treated with untreated directly. First the age mix in each group, by Bayes' theorem:</p>
+  <div class="eq">\[P(\text{old} \mid X{=}1) = \frac{P(X{=}1 \mid \text{old})\,P(\text{old})}{P(X{=}1)} = \frac{0.8 \cdot 0.5}{0.8\cdot0.5 + 0.2\cdot0.5} = 0.8\]</div>
+  <div class="note num"><div>Bayes flips the conditional: we know how likely old people are to be treated, and want how likely treated people are to be old. The denominator \(P(X{=}1)\) is the overall share treated: 0.4 from the old half plus 0.1 from the young half, so 0.5. Then 0.4 / 0.5 = 0.8. So 80% of treated people are old. By the same calculation, only 20% of untreated people are old.</div></div>
+  <div class="eq">\[P(Y{=}1 \mid X{=}1) = 0.8 \cdot 0.4 + 0.2 \cdot 0.9 = 0.50\]</div>
+  <div class="eq">\[P(Y{=}1 \mid X{=}0) = 0.2 \cdot 0.3 + 0.8 \cdot 0.8 = 0.70\]</div>
+  <div class="note num"><div>Same weighted average as before, but now weighted by the age mix <b>of each group</b> instead of the whole population. The treated group is dominated by old people with poor recovery. Result: treated 0.50, untreated 0.70, difference \(-0.20\).</div></div>
+  <p>The naive comparison says the treatment <i>harms</i> by 20 points; the truth is it helps by 10. This sign flip is Simpson's paradox. The only difference between the two calculations is which weights are used: \(P(z)\) versus \(P(z \mid x)\).</p>
+  <div class="note"><div>That one substitution is the whole content of the do-calculus in this example: it proves, from the graph alone, that \(P(z)\) is the correct weight.</div></div>
+</div>
+
+<h2>Example 2: the front door</h2>
+<div class="step">
+  <p>In Example 1 the adjustment could have been guessed. Here it can't, because the confounder is never measured. \(X\) is smoking, \(M\) is tar in the lungs, \(Y\) is cancer, \(U\) is an unobserved genotype that influences both smoking and cancer.</p>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2"></div><figcaption>\(G\): dashed circle means unobserved</figcaption></figure>
+  </div>
+  <div class="note"><div>Two assumptions are built into this graph. Smoking affects cancer <b>only</b> through tar (no direct \(X \to Y\) arrow). And the gene does not affect tar directly (no \(U \to M\) arrow). With \(U\) unmeasured, we cannot condition on it, so the trick from Example 1 is unavailable. The plan: get the effect in two hops, \(X \to M\) and \(M \to Y\), and chain them.</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 1: effect of smoking on tar</h3>
+  <div class="eq">\[P(m \mid do(x)) = P(m \mid x) \qquad\text{by Rule 2}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2" data-cut="X>M"></div><figcaption>\(G_{\underline{X}}\): arrow out of \(X\) cut</figcaption></figure>
+  </div>
+  <p>Check \((M \perp X)\) in \(G_{\underline{X}}\): the only path is \(X \leftarrow U \to Y \leftarrow M\), which has a collider at \(Y\).</p>
+  <div class="note"><div>Remove smoking's causal arrow and ask if anything else links smoking to tar. The only route goes up through the gene, down to cancer, and back to tar. At cancer, two arrows collide (\(U \to Y \leftarrow M\)), so the route is blocked. Smoking and tar have no shared cause, so the observed relationship is causal: seeing equals doing.</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 2: effect of tar on cancer</h3>
+  <div class="eq">\[P(y \mid do(m)) = \sum_{x} P(y \mid do(m), x)\; P(x \mid do(m))\]</div>
+  <div class="note"><div>Law of total probability again, this time splitting by smoking status \(x\). We will now get rid of both \(do(m)\)'s separately.</div></div>
+  <div class="eq">\[P(x \mid do(m)) = P(x) \qquad\text{by Rule 3}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2" data-cut="X>M"></div><figcaption>\(G_{\overline{M}}\): arrow into \(M\) cut</figcaption></figure>
+  </div>
+  <div class="note"><div>Does forcing a certain amount of tar into someone's lungs change whether they smoke? No. Graph check: after cutting \(X \to M\), the only path from \(M\) to \(X\) is \(M \to Y \leftarrow U \to X\), again blocked by the collider at \(Y\). (This picture looks the same as Step 1 because \(X \to M\) is both the only arrow out of \(X\) and the only arrow into \(M\).)</div></div>
+  <div class="eq">\[P(y \mid do(m), x) = P(y \mid m, x) \qquad\text{by Rule 2}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2" data-cut="M>Y"></div><figcaption>\(G_{\underline{M}}\): arrow out of \(M\) cut</figcaption></figure>
+  </div>
+  <div class="note"><div>Remove tar's causal effect on cancer. The leftover path from tar to cancer is \(M \leftarrow X \leftarrow U \to Y\): back through smoking, up through the gene. The middle node \(X\) is a chain junction, and we condition on \(X\), so the path is blocked. This is the key insight: <b>smoking status acts as a shield</b> against the hidden gene. Within one smoking group, the gene's influence on tar is cut off.</div></div>
+  <p>Putting both together:</p>
+  <div class="eq">\[P(y \mid do(m)) = \sum_{x'} P(y \mid m, x')\; P(x')\]</div>
+  <div class="note"><div>This is the backdoor formula from Example 1, with smoking playing the role that age played. The prime in \(x'\) is only a renamed summation index, so it doesn't get confused with the \(x\) we will intervene on in the final formula.</div></div>
+</div>
+
+<div class="step">
+  <h3>Step 3: chain the two hops</h3>
+  <div class="eq">\[P(y \mid do(x)) = \sum_m P(y \mid do(x), m)\; P(m \mid do(x))\]</div>
+  <div class="note"><div>Split by tar level \(m\). The second factor is already solved (Step 1). For the first factor we need two moves.</div></div>
+  <div class="eq">\[P(y \mid do(x), m) = P(y \mid do(x), do(m)) \qquad\text{by Rule 2}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2" data-cut="U>X,M>Y"></div><figcaption>\(G_{\overline{X}\underline{M}}\): into \(X\) and out of \(M\) cut</figcaption></figure>
+  </div>
+  <div class="note"><div>Here Rule 2 is used "backwards": we replace seeing \(m\) by doing \(m\). That is allowed because the rule is an equality. Check: with arrows into \(X\) and out of \(M\) gone, \(M\) touches only \(X\), and \(X\) touches only \(M\). No path reaches \(Y\). So once smoking is forced, observing tar and forcing tar are the same thing.</div></div>
+  <div class="eq">\[P(y \mid do(x), do(m)) = P(y \mid do(m)) \qquad\text{by Rule 3}\]</div>
+  <div class="figs">
+    <figure><div class="dag" data-g="ex2" data-cut="U>X,X>M"></div><figcaption>\(G_{\overline{X}\overline{M}}\): into \(X\) and into \(M\) cut</figcaption></figure>
+  </div>
+  <div class="note"><div>If tar is already forced to level \(m\), does additionally forcing smoking matter for cancer? No, because smoking only acts through tar, and tar is fixed. Graph check: \(X\) has no edges left at all, completely isolated. So \(do(x)\) can be deleted.</div></div>
+</div>
+
+<div class="step">
+  <h3>Result: the front-door formula</h3>
+  <div class="eq result">\[P(y \mid do(x)) = \sum_m P(m \mid x) \sum_{x'} P(y \mid m, x')\; P(x')\]</div>
+  <div class="note"><div>Read it as a two-stage recipe. Outer sum: how likely is each tar level \(m\) for a smoker (Step 1, directly observable). Inner sum: how much does tar level \(m\) cause cancer, estimated by comparing within smoking groups and averaging over the population's smoking rate (Step 2). Multiply and add over all tar levels. Every quantity is observational, yet the gene \(U\) never appears. The causal effect is identified without ever measuring the confounder.</div></div>
+</div>
+
+<h2>The pattern</h2>
+<p>Both derivations follow the same loop: expand with the law of total probability, then for each factor pick a rule, draw the modified graph it names, and check the independence. When no \(do\) is left, you are done.</p>
+<div class="note"><div>And when you <i>can't</i> remove all the \(do\)'s, that is informative too. Shpitser and Pearl, and independently Huang and Valtorta, proved the three rules are <b>complete</b>: if they fail, no amount of observational data can identify the effect for that graph. You would need an experiment, or a stronger assumption.</div></div>
+</main>
+
+<script>
+const GRAPHS={
+  ex1:{w:300,h:165,nodes:{Z:[150,32,'age'],X:[60,128,'treatment'],Y:[240,128,'recovery']},edges:['Z>X','Z>Y','X>Y']},
+  ex2:{w:400,h:170,nodes:{U:[200,32,'gene',1],X:[55,132,'smoking'],M:[200,132,'tar'],Y:[345,132,'cancer']},edges:['U>X','U>Y','X>M','M>Y']}
+};
+const NS='http://www.w3.org/2000/svg';
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e}
+document.querySelectorAll('.dag').forEach(div=>{
+  const g=GRAPHS[div.dataset.g];const cut=(div.dataset.cut||'').split(',').filter(Boolean);
+  const svg=el('svg',{viewBox:`0 0 ${g.w} ${g.h}`,role:'img',style:`max-width:${g.w}px`});
+  const r=17;
+  g.edges.forEach(e=>{
+    const [a,b]=e.split('>');const [x1,y1]=g.nodes[a],[x2,y2]=g.nodes[b];
+    const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    const sx=x1+ux*r,sy=y1+uy*r,ex=x2-ux*(r+2),ey=y2-uy*(r+2);
+    const isCut=cut.includes(e);const cls=isCut?' cut':'';
+    svg.appendChild(el('line',{x1:sx,y1:sy,x2:ex-ux*8,y2:ey-uy*8,class:'edge'+cls}));
+    const px=-uy,py=ux;
+    svg.appendChild(el('polygon',{points:`${ex},${ey} ${ex-ux*10+px*5},${ey-uy*10+py*5} ${ex-ux*10-px*5},${ey-uy*10-py*5}`,class:'head'+cls}));
+    if(isCut){const mx=(sx+ex)/2,my=(sy+ey)/2;
+      svg.appendChild(el('line',{x1:mx-6,y1:my-6,x2:mx+6,y2:my+6,class:'edge cut',style:'stroke-dasharray:none;opacity:1;stroke-width:2.2'}));
+      svg.appendChild(el('line',{x1:mx-6,y1:my+6,x2:mx+6,y2:my-6,class:'edge cut',style:'stroke-dasharray:none;opacity:1;stroke-width:2.2'}));}
+  });
+  for(const k in g.nodes){const [x,y,lab,hid]=g.nodes[k];
+    svg.appendChild(el('circle',{cx:x,cy:y,r,class:hid?'hidden':''}));
+    const t=el('text',{x,y});t.textContent=k;svg.appendChild(t);
+    const l=el('text',{x,y:y<60?y-r-9:y+r+13,class:'lab'});l.textContent=lab;svg.appendChild(l);}
+  div.appendChild(svg);
+});
+</script>
+
+</body></html>
